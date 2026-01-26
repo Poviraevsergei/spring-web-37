@@ -1,18 +1,22 @@
 package com.tms.controller;
 
+import com.tms.exception.SecurityNotFound;
+import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-//CRUD + logic methods
 @Controller
-@RequestMapping("/security") //путь перед всеми методами контроллера
+@RequestMapping("/security")
 public class SecurityController {
     private final SecurityService securityService;
 
@@ -22,20 +26,26 @@ public class SecurityController {
 
     @GetMapping("/registration")
     public String getRegistrationPage() {
+        if (true){
+            throw new SecurityNotFound();
+        }
         return "registration";
     }
 
     @PostMapping("/registration")
-    public ModelAndView registration(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam("firstName") String firstName,
-            @RequestParam("lastName") String lastName,
-            @RequestParam("email") String email,
-            @RequestParam(value = "age") Integer age,
-            ModelAndView modelAndView
-    ) {
-        UserResponse userResponse = securityService.registration(username, password, firstName, lastName, email, age);
+    public ModelAndView registration(@ModelAttribute @Valid RequestRegistrationDTO registrationDTO,
+                                     BindingResult bindingResult,
+                                     ModelAndView modelAndView) {
+        if (bindingResult.hasErrors()) {
+            for (ObjectError objectError : bindingResult.getAllErrors()) {
+                System.out.println(objectError.getDefaultMessage());
+            }
+            modelAndView.addObject("errors", bindingResult.getAllErrors());
+            modelAndView.setViewName("error");
+            return modelAndView;
+        }
+
+        UserResponse userResponse = securityService.registration(registrationDTO);
         modelAndView.addObject("first_name", userResponse.getFirstName());
         modelAndView.addObject("last_name", userResponse.getLastName());
         modelAndView.addObject("email", userResponse.getEmail());
@@ -51,10 +61,19 @@ public class SecurityController {
     }
 
 
-    //Знать:
-    //1. схему Spring MVC
-    //2. Как настраивать MVC
-    //3. разница @PathVariable @RequestParam
-    //4. Что такое Model и ModelAndView
-    //5. Что такое Interceptor
+    //Валидация:
+    //1. расставить аннотации в DTO
+    //2. Поставить @Valid
+    //3. BindingResult bindingResult
+    //4. @EnableWebMvc
+
+    //1. ExceptionHandler на уровне контроллера(не круто)
+    //@ExceptionHandler(value = {SecurityNotFound.class, Exception.class})
+    //public ModelAndView exceptionHandler(Exception e) {
+        //    ModelAndView modelAndView = new ModelAndView();
+        //    System.out.println("exceptionHandler method in SecurityController. Exception: " + e);
+        //    modelAndView.addObject("errors", e.getMessage());
+        //    modelAndView.setViewName("error");
+        //    return modelAndView;
+        //}
 }

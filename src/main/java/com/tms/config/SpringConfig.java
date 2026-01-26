@@ -7,11 +7,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-@EnableWebMvc //Включает Interceptor(и не только)
+@EnableWebMvc //Включает Interceptor, Validation (и не только)
 @Configuration
 @ComponentScan("com.tms")
 public class SpringConfig implements WebMvcConfigurer {
