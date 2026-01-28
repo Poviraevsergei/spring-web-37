@@ -56,20 +56,11 @@ public class SecurityController {
         return "registration-response";
     }
 
+    @GetMapping
+    public String getAllSecurities() {
+        securityService.getAllSecurities();
+        return "success";
+    }
 
-    //Валидация:
-    //1. расставить аннотации в DTO
-    //2. Поставить @Valid
-    //3. BindingResult bindingResult
-    //4. @EnableWebMvc
 
-    //1. ExceptionHandler на уровне контроллера(не круто)
-    //@ExceptionHandler(value = {SecurityNotFound.class, Exception.class})
-    //public ModelAndView exceptionHandler(Exception e) {
-        //    ModelAndView modelAndView = new ModelAndView();
-        //    System.out.println("exceptionHandler method in SecurityController. Exception: " + e);
-        //    modelAndView.addObject("errors", e.getMessage());
-        //    modelAndView.setViewName("error");
-        //    return modelAndView;
-        //}
 }
