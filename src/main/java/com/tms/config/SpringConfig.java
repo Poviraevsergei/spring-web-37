@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-@EnableWebMvc //Включает Interceptor, Validation (и не только)
 @Configuration
 @ComponentScan("com.tms")
 public class SpringConfig implements WebMvcConfigurer {
@@ -20,15 +19,6 @@ public class SpringConfig implements WebMvcConfigurer {
     @Autowired
     public SpringConfig(SecurityInterceptor securityInterceptor) {
         this.securityInterceptor = securityInterceptor;
-    }
-
-    //Настройка ViewResolver бина
-    @Bean
-    public InternalResourceViewResolver viewResolver() {
-        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("/WEB-INF/views/");
-        viewResolver.setSuffix(".jsp");
-        return viewResolver;
     }
 
     @Override

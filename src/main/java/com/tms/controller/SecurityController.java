@@ -1,6 +1,5 @@
 package com.tms.controller;
 
-import com.tms.exception.SecurityNotFound;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
@@ -26,9 +25,6 @@ public class SecurityController {
 
     @GetMapping("/registration")
     public String getRegistrationPage() {
-        if (true){
-            throw new SecurityNotFound();
-        }
         return "registration";
     }
 
