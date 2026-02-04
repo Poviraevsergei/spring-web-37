@@ -20,7 +20,6 @@ public class SecurityService {
     }
 
     public UserResponse registration(RequestRegistrationDTO registrationDTO){
-
         System.out.println(registrationDTO.getUsername());
         System.out.println(registrationDTO.getPassword());
         System.out.println(registrationDTO.getFirstName());

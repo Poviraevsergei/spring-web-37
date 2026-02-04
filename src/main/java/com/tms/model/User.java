@@ -13,5 +13,4 @@ public class User {
     private Integer age;
     private Instant created;
     private Instant updated;
-    private boolean active;
 }

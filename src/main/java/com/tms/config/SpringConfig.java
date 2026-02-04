@@ -15,7 +15,6 @@ import java.sql.SQLException;
 
 @Configuration
 @ComponentScan("com.tms")
-// @PropertySource("classpath:application.properties") - вычитывает файл с настройками который укажите
 public class SpringConfig implements WebMvcConfigurer {
 
     @Value("${spring.datasource.url}")

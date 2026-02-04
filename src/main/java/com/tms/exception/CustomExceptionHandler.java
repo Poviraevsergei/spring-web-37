@@ -1,27 +1,31 @@
 package com.tms.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ControllerAdvice //говорит Spring что это глобальный обработчик исключений
+@ControllerAdvice
 public class CustomExceptionHandler {
 
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ExceptionHandler(SecurityNotFound.class)
-    public ModelAndView securityNotFoundExceptionHandler(SecurityNotFound e) {
+    public String securityNotFoundExceptionHandler(SecurityNotFound e) {
         System.out.println("ExceptionHandler: " + e);
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errors", e.getMessage());
-        modelAndView.setViewName("error");
-        return modelAndView;
+        return e.getMessage();
     }
 
     @ExceptionHandler(Exception.class)
-    public ModelAndView exceptionHandler(Exception e) {
+    public ResponseEntity<String> exceptionHandler(Exception e) {
         System.out.println("ExceptionHandler: " + e);
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errors", e.getMessage());
-        modelAndView.setViewName("error");
-        return modelAndView;
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> httpMessageNotReadableExceptionHandler(Exception e) {
+        System.out.println("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
