@@ -4,6 +4,11 @@ import com.tms.model.User;
 import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
 import com.tms.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Optional;
 
+@Tag(name = "UserController" ,description = "Контроллер для пользователей")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -35,8 +41,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Поиск пользователей",
+            description = "Система ищет пользователя в БД по id который передан в пути.")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Данного юзера не существует в системе", responseCode = "404"),
+            @ApiResponse(description = "Успешный возврат пользователя", responseCode = "200")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Integer id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") @Parameter(description = "Id пользователя", example = "1") Integer id) {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             return ResponseEntity.ok(userOptional.get());
@@ -80,6 +92,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Tag(name = "Удаление", description = "Эндпоинты связанные с удалением!!!")
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id) {
         userService.delete(id);
