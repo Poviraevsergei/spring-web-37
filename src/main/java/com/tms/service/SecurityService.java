@@ -4,11 +4,13 @@ import com.tms.model.Security;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.repository.SecurityRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class SecurityService {
 
@@ -20,13 +22,8 @@ public class SecurityService {
     }
 
     public UserResponse registration(RequestRegistrationDTO registrationDTO){
-        System.out.println(registrationDTO.getUsername());
-        System.out.println(registrationDTO.getPassword());
-        System.out.println(registrationDTO.getFirstName());
-        System.out.println(registrationDTO.getLastName());
-        System.out.println(registrationDTO.getEmail());
-        System.out.println(registrationDTO.getAge());
-        System.out.println("Successfully registered"); //TODO: сделать регистрацию
+        //TODO: сделать регистрацию
+        log.info("Successfully registered");
 
         UserResponse userResponse = new UserResponse();
         userResponse.setFirstName(registrationDTO.getFirstName());

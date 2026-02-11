@@ -4,6 +4,7 @@ import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+@Slf4j
 @Controller
 @RequestMapping("/security")
 public class SecurityController {
@@ -34,7 +36,7 @@ public class SecurityController {
                                      ModelAndView modelAndView) {
         if (bindingResult.hasErrors()) {
             for (ObjectError objectError : bindingResult.getAllErrors()) {
-                System.out.println(objectError.getDefaultMessage());
+                log.warn(objectError.getDefaultMessage());
             }
             modelAndView.addObject("errors", bindingResult.getAllErrors());
             modelAndView.setViewName("error");
@@ -52,7 +54,7 @@ public class SecurityController {
 
     @GetMapping("/{id}")
     public String getSecurityById(@PathVariable("id") Long id) {
-        System.out.println("getSecurityById method in SecurityController. Id: " + id);
+        log.info("getSecurityById method in SecurityController. Id: " + id);
         return "registration-response";
     }
 

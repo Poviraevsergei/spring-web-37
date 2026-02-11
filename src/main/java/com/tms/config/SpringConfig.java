@@ -1,6 +1,7 @@
 package com.tms.config;
 
 import com.tms.interceptor.SecurityInterceptor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+@Slf4j
 @Configuration
 @ComponentScan("com.tms")
 public class SpringConfig implements WebMvcConfigurer {
@@ -54,7 +56,7 @@ public class SpringConfig implements WebMvcConfigurer {
                     dbUsername,
                     dbPassword);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

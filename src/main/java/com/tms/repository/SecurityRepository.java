@@ -1,6 +1,7 @@
 package com.tms.repository;
 
 import com.tms.model.Security;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class SecurityRepository {
     private final Connection connection;
@@ -23,7 +25,7 @@ public class SecurityRepository {
         try {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM users");
             boolean result = statement.execute();
-            System.out.println(result);
+            log.info(String.valueOf(result));
             return new ArrayList<>();
         } catch (SQLException e) {
             throw new RuntimeException(e);

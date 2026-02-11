@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,10 +33,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Optional;
 
+@Slf4j
 @Tag(name = "UserController" ,description = "Контроллер для пользователей")
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    //private final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -49,10 +54,14 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") @Parameter(description = "Id пользователя", example = "1") Integer id) {
+        log.info("IN: getUserById(). Params: id = " + id);
+
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
+            log.info("OUT: getUserById(). Result: null" + userOptional.get());
             return ResponseEntity.ok(userOptional.get());
         }
+        log.info("OUT: getUserById(). Result: null");
         return ResponseEntity.notFound().build();
     }
 
@@ -69,7 +78,7 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody @Valid UserCreateDto userDto,
                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            System.out.println(bindingResult.getAllErrors());
+            log.warn(bindingResult.getAllErrors().toString());
             return ResponseEntity.badRequest().body(null);
         }
         User user = userService.save(userDto);
@@ -85,7 +94,7 @@ public class UserController {
     public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid UserUpdateDto userDto,
                                                  BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            System.out.println(bindingResult.getAllErrors());
+            log.warn(bindingResult.getAllErrors().toString());
             return ResponseEntity.badRequest().body(null);
         }
         userService.update(userDto);
@@ -99,3 +108,23 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
