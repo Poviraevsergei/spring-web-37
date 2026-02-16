@@ -11,8 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,7 +36,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    //private final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -58,7 +55,7 @@ public class UserController {
 
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
-            log.info("OUT: getUserById(). Result: null" + userOptional.get());
+            log.info("OUT: getUserById(). Result: " + userOptional.get());
             return ResponseEntity.ok(userOptional.get());
         }
         log.info("OUT: getUserById(). Result: null");
@@ -79,7 +76,7 @@ public class UserController {
                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.warn(bindingResult.getAllErrors().toString());
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().build();
         }
         User user = userService.save(userDto);
 
@@ -95,7 +92,7 @@ public class UserController {
                                                  BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.warn(bindingResult.getAllErrors().toString());
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().build();
         }
         userService.update(userDto);
         return ResponseEntity.noContent().build();
