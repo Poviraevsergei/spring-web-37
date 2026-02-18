@@ -1,8 +1,14 @@
 package com.tms.service;
 
+import com.tms.exception.UpdateException;
+import com.tms.exception.UserCreateException;
+import com.tms.exception.UserNotFoundException;
 import com.tms.model.User;
 import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
+import com.tms.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,10 +23,17 @@ import java.util.function.Function;
 
 @Service
 public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public Optional<User> getUserById(Integer id) {
-        User user = new User();
-        user.setId(id);
-        return Optional.ofNullable(null);
+        return Optional.ofNullable(userRepository.findUserById(id));
+
     }
 
     public Page<User> getAllUsers(Pageable pageable) {
@@ -109,28 +122,37 @@ public class UserService {
         };
     }
 
-    public User save(UserCreateDto dto){
+    public User save(UserCreateDto dto) throws UserCreateException {
         User user = new User();
-        user.setId(new Random().nextInt(10,100));
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setAge(dto.getAge());
         user.setCreated(Instant.now());
         user.setUpdated(Instant.now());
-        return user;
+
+        return userRepository.saveUser(user);
     }
 
-    public void delete(Integer id) {
-        // Есть ли юзер?
-        // Проверяем можно ли удалить
-        // Удаляем
-        // Перепроверяем
+    public void delete(Integer id) throws UserNotFoundException {
+        User user = userRepository.findUserById(id);
+        if (user == null){
+            throw new UserNotFoundException();
+        }
+        userRepository.removeUserById(id);
+
     }
 
-    public void update(UserUpdateDto updateDto) {
-        // Есть ли юзер?
-        // Проверяем можно ли обновить
-        // Обновляем
+    public User update(UserUpdateDto updateDto) throws UserNotFoundException, UpdateException {
+        User user = userRepository.findUserById(updateDto.getId());
+        if (user == null){
+            throw new UserNotFoundException();
+        }
+        user.setFirstName(updateDto.getFirstName());
+        user.setLastName(updateDto.getLastName());
+        user.setEmail(updateDto.getEmail());
+        user.setAge(updateDto.getAge());
+        user.setUpdated(Instant.now());
+        return userRepository.updateUser(user);
     }
 }

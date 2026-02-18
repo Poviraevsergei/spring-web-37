@@ -15,8 +15,12 @@ public class UserUpdateDto {
     private String firstName;
     @NotBlank
     private String lastName;
+
+    @NotBlank
     @Email
     private String email;
+
+    @NotNull
     @Min(18)
     @Max(100)
     private Integer age;

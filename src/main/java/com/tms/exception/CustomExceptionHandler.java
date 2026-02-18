@@ -44,4 +44,28 @@ public class CustomExceptionHandler {
         log.error("ExceptionHandler: " + e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(UserCreateException.class)
+    public ResponseEntity<String> userCreateExceptionHandler(UserCreateException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> userNotFoundExceptionHandler(UserNotFoundException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UpdateException.class)
+    public ResponseEntity<String> updateExceptionHandler(UpdateException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> runtimeExceptionHandler(RuntimeException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

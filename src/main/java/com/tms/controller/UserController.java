@@ -1,5 +1,8 @@
 package com.tms.controller;
 
+import com.tms.exception.UpdateException;
+import com.tms.exception.UserCreateException;
+import com.tms.exception.UserNotFoundException;
 import com.tms.model.User;
 import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
@@ -32,7 +35,7 @@ import java.net.URI;
 import java.util.Optional;
 
 @Slf4j
-@Tag(name = "UserController" ,description = "Контроллер для пользователей")
+@Tag(name = "UserController", description = "Контроллер для пользователей")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -73,7 +76,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid UserCreateDto userDto,
-                                           BindingResult bindingResult) {
+                                           BindingResult bindingResult) throws UserCreateException {
         if (bindingResult.hasErrors()) {
             log.warn(bindingResult.getAllErrors().toString());
             return ResponseEntity.badRequest().build();
@@ -88,19 +91,19 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<HttpStatus> updateUser(@RequestBody @Valid UserUpdateDto userDto,
-                                                 BindingResult bindingResult) {
+    public ResponseEntity<User> updateUser(@RequestBody @Valid UserUpdateDto userDto,
+                                                 BindingResult bindingResult) throws UserNotFoundException, UpdateException {
         if (bindingResult.hasErrors()) {
             log.warn(bindingResult.getAllErrors().toString());
             return ResponseEntity.badRequest().build();
         }
-        userService.update(userDto);
-        return ResponseEntity.noContent().build();
+        User user = userService.update(userDto);
+        return ResponseEntity.ok(user);
     }
 
     @Tag(name = "Удаление", description = "Эндпоинты связанные с удалением!!!")
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id) throws UserNotFoundException {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
