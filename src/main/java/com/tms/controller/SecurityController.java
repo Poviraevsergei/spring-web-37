@@ -1,10 +1,13 @@
 package com.tms.controller;
 
+import com.tms.model.Security;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -13,10 +16,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Optional;
+
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/security")
 public class SecurityController {
     private final SecurityService securityService;
@@ -31,38 +37,24 @@ public class SecurityController {
     }
 
     @PostMapping("/registration")
-    public ModelAndView registration(@ModelAttribute @Valid RequestRegistrationDTO registrationDTO,
-                                     BindingResult bindingResult,
-                                     ModelAndView modelAndView) {
+    public ResponseEntity<HttpStatus> registration(@ModelAttribute @Valid RequestRegistrationDTO registrationDTO,
+                                                   BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             for (ObjectError objectError : bindingResult.getAllErrors()) {
                 log.warn(objectError.getDefaultMessage());
             }
-            modelAndView.addObject("errors", bindingResult.getAllErrors());
-            modelAndView.setViewName("error");
-            return modelAndView;
+           return null;
         }
-
         UserResponse userResponse = securityService.registration(registrationDTO);
-        modelAndView.addObject("first_name", userResponse.getFirstName());
-        modelAndView.addObject("last_name", userResponse.getLastName());
-        modelAndView.addObject("email", userResponse.getEmail());
-        modelAndView.addObject("age", userResponse.getAge());
-        modelAndView.setViewName("registration-response");
-        return modelAndView;
+        return null;
     }
 
     @GetMapping("/{id}")
-    public String getSecurityById(@PathVariable("id") Long id) {
-        log.info("getSecurityById method in SecurityController. Id: " + id);
-        return "registration-response";
+    public ResponseEntity<Security> getSecurityById(@PathVariable("id") Integer id) {
+        Optional<Security> securityOptional = securityService.getSecurityById(id);
+        if (securityOptional.isPresent()) {
+            return ResponseEntity.ok(securityOptional.get());
+        }
+        return ResponseEntity.notFound().build();
     }
-
-    @GetMapping
-    public String getAllSecurities() {
-        securityService.getAllSecurities();
-        return "success";
-    }
-
-
 }

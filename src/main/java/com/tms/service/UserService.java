@@ -3,6 +3,7 @@ package com.tms.service;
 import com.tms.exception.UpdateException;
 import com.tms.exception.UserCreateException;
 import com.tms.exception.UserNotFoundException;
+import com.tms.model.Security;
 import com.tms.model.User;
 import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
@@ -32,8 +33,8 @@ public class UserService {
     }
 
     public Optional<User> getUserById(Integer id) {
-        return Optional.ofNullable(userRepository.findUserById(id));
-
+        User userFromDb = userRepository.findUserById(id);
+        return Optional.ofNullable(userFromDb);
     }
 
     public Page<User> getAllUsers(Pageable pageable) {

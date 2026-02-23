@@ -1,34 +1,29 @@
 package com.tms.repository;
 
-import com.tms.model.Security;
-import com.tms.model.User;
+import com.tms.model.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Slf4j
 @Repository
-public class SecurityRepository {
-
+public class ProductRepository {
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public SecurityRepository(EntityManagerFactory entityManagerFactory) {
+    public ProductRepository(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 
-    public Security findSecurityById(int id) {
-        Security security = null;
+    public Product findProductById(int id) {
+        Product product = null;
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            security = entityManager.find(Security.class, id);
+            product = entityManager.find(Product.class, id);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return security;
+        return product;
     }
 }

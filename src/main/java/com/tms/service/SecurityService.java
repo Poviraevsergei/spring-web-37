@@ -1,6 +1,7 @@
 package com.tms.service;
 
 import com.tms.model.Security;
+import com.tms.model.User;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.repository.SecurityRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,7 +35,11 @@ public class SecurityService {
         return userResponse;
     }
 
+    public Optional<Security> getSecurityById(Integer id) {
+        return Optional.ofNullable(securityRepository.findSecurityById(id));
+    }
+
     public List<Security> getAllSecurities(){
-        return securityRepository.getAllSecurities();
+        return null;
     }
 }
