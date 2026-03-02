@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -62,14 +63,11 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-/*    @GetMapping
-    public ResponseEntity<Page<User>> getAllUsers(@PageableDefault(
-            size = 20,
-            sort = "id",
-            direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<User> userPage = userService.getAllUsers(pageable);
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> userPage = userService.getAllUsers();
         return ResponseEntity.ok(userPage);
-    }*/
+    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid UserCreateDto userDto,

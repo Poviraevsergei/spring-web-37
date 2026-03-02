@@ -49,16 +49,11 @@ public class UserRepository {
     public List<User> findAllUsers() {
         List<User> users = null;
         try (Session session = sessionFactory.openSession()) {
-            //Создание CriteriaBuilder
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<User> criteriaQuery = cb.createQuery(User.class);
-            Root<User> root = criteriaQuery.from(User.class);
-
-            //Добавляем ограничение
-            criteriaQuery.select(root);
-            users = session.createQuery(criteriaQuery).getResultList();
+            Query<User> query = session.createNamedQuery("getAllUsers", User.class);
+            users = query.getResultList();
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw new RuntimeException();
         }
         return users;
     }
