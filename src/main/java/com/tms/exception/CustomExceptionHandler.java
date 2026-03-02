@@ -1,6 +1,8 @@
 package com.tms.exception;
 
+import jakarta.persistence.NoResultException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.NonUniqueResultException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -65,6 +67,18 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> runtimeExceptionHandler(RuntimeException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NonUniqueResultException.class)
+    public ResponseEntity<String> nonUniqueResultExceptionHandler(NonUniqueResultException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NoResultException.class)
+    public ResponseEntity<String> noResultExceptionHandler(NoResultException e) {
         log.error("ExceptionHandler: " + e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
