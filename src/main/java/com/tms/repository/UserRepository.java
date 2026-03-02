@@ -3,6 +3,11 @@ package com.tms.repository;
 import com.tms.exception.UpdateException;
 import com.tms.exception.UserCreateException;
 import com.tms.model.User;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,9 +32,14 @@ public class UserRepository {
     public User findUserById(int id) {
         User user = null;
         try (Session session = sessionFactory.openSession()) {
-            Query<User> userQuery = session.createQuery("from User where id = :id", User.class);
-            userQuery.setParameter("id", id);
-            return userQuery.getSingleResultOrNull();
+            //Создание CriteriaBuilder
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<User> criteriaQuery = cb.createQuery(User.class);
+            Root<User> root = criteriaQuery.from(User.class);
+
+            //Добавляем ограничение
+            criteriaQuery.select(root).where(cb.equal(root.get("id"), id));
+            user = session.createQuery(criteriaQuery).getSingleResultOrNull();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -39,20 +49,25 @@ public class UserRepository {
     public List<User> findAllUsers() {
         List<User> users = null;
         try (Session session = sessionFactory.openSession()) {
-            Query query = session.createQuery("FROM User", User.class);
-            users = query.getResultList();
+            //Создание CriteriaBuilder
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<User> criteriaQuery = cb.createQuery(User.class);
+            Root<User> root = criteriaQuery.from(User.class);
+
+            //Добавляем ограничение
+            criteriaQuery.select(root);
+            users = session.createQuery(criteriaQuery).getResultList();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         return users;
     }
 
-    // Не предназначен для добавления строк(только из других таблиц)
+    // Не предназначен для добавления строк
     public User saveUser(User user) throws UserCreateException {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            MutationQuery query = session.createQuery("INSERT INTO User(firstName, lastName) SELECT firstName, lastName FROM UserSecond");
-            query.executeUpdate();
+            session.persist(user);
             session.getTransaction().commit();
             return user;
         } catch (Exception e) {
@@ -63,21 +78,30 @@ public class UserRepository {
 
     public User updateUser(User user) throws UpdateException {
         try (Session session = sessionFactory.openSession()) {
-            MutationQuery query = session.createMutationQuery("UPDATE User SET firstName =:firstName, " +
-                    "lastName =:lastName, email=:email, age=:age, updated=:updated WHERE id =:id");
-            query.setParameter("firstName", user.getFirstName());
-            query.setParameter("lastName", user.getLastName());
-            query.setParameter("email", user.getEmail());
-            query.setParameter("age", user.getAge());
-            query.setParameter("updated", user.getUpdated());
-            query.setParameter("id", user.getId());
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
+            CriteriaQuery<User> criteriaGet = cb.createQuery(User.class);
+            Root<User> rootUpdate = criteriaUpdate.from(User.class);
+            Root<User> rootGet = criteriaGet.from(User.class);
+
+            //Устанавливает поля
+            criteriaUpdate.set(rootUpdate.get("firstName"), user.getFirstName());
+            criteriaUpdate.set(rootUpdate.get("lastName"), user.getLastName());
+            criteriaUpdate.set(rootUpdate.get("email"), user.getEmail());
+            criteriaUpdate.set(rootUpdate.get("age"), user.getAge());
+            criteriaUpdate.set(rootUpdate.get("updated"), user.getUpdated());
+
+            //Добавляем ограничение
+            criteriaUpdate.where(cb.equal(rootUpdate.get("id"), user.getId()));
+
+            //Выполняем запрос
             session.getTransaction().begin();
+            MutationQuery query = session.createMutationQuery(criteriaUpdate);
             query.executeUpdate();
             session.getTransaction().commit();
 
-            Query<User> queryFindUser = session.createQuery("FROM User WHERE id =:id", User.class);
-            queryFindUser.setParameter("id", user.getId());
-            return queryFindUser.getSingleResult();
+            criteriaGet.select(rootGet).where(cb.equal(rootGet.get("id"), user.getId()));
+            return session.createQuery(criteriaGet).getSingleResult();
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new UpdateException();
@@ -86,8 +110,14 @@ public class UserRepository {
 
     public void removeUserById(Integer id) {
         try (Session session = sessionFactory.openSession()) {
-            MutationQuery query = session.createMutationQuery("DELETE FROM User WHERE id =:id");
-            query.setParameter("id", id);
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaDelete<User> criteriaQuery = cb.createCriteriaDelete(User.class);
+            Root<User> root = criteriaQuery.from(User.class);
+
+            criteriaQuery.where(cb.equal(root.get("id"), id));
+
+            MutationQuery query = session.createMutationQuery(criteriaQuery);
+
             session.getTransaction().begin();
             query.executeUpdate();
             session.getTransaction().commit();
