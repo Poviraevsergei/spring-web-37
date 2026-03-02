@@ -3,10 +3,10 @@ package com.tms.repository;
 import com.tms.exception.UpdateException;
 import com.tms.exception.UserCreateException;
 import com.tms.model.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Query;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,17 +16,17 @@ import java.util.List;
 @Repository
 public class UserRepository {
 
-    private final EntityManagerFactory entityManagerFactory;
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public UserRepository(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
+    public UserRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public User findUserById(int id) {
         User user = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            user = entityManager.find(User.class, id);
+        try (Session session = sessionFactory.openSession()) {
+            user = session.find(User.class, id);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -35,8 +35,8 @@ public class UserRepository {
 
     public List<User> findAllUsers() {
         List<User> users = null;
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            Query query = entityManager.createNativeQuery("SELECT * FROM users", User.class);
+        try (Session session = sessionFactory.openSession()) {
+            Query query = session.createNativeQuery("SELECT * FROM users", User.class);
             users = query.getResultList();
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -45,10 +45,10 @@ public class UserRepository {
     }
 
     public User saveUser(User user) throws UserCreateException {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            entityManager.getTransaction().begin();
-            entityManager.persist(user);
-            entityManager.getTransaction().commit();
+        try (Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
+            session.persist(user);
+            session.getTransaction().commit();
             return user;
         } catch (Exception e){
             log.error(e.getMessage());
@@ -57,10 +57,10 @@ public class UserRepository {
     }
 
     public User updateUser(User user) throws UpdateException {
-        try(EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            entityManager.getTransaction().begin();
-            entityManager.merge(user);
-            entityManager.getTransaction().commit();
+        try(Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
+            session.merge(user);
+            session.getTransaction().commit();
             return user;
         } catch (Exception e){
             log.error(e.getMessage());
@@ -69,10 +69,10 @@ public class UserRepository {
     }
 
     public void removeUserById(Integer id) {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            entityManager.getTransaction().begin();
-            entityManager.remove(entityManager.find(User.class, id));
-            entityManager.getTransaction().commit();
+        try (Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
+            session.remove(session.find(User.class, id));
+            session.getTransaction().commit();
         } catch (Exception e){
             log.error(e.getMessage());
             throw new RuntimeException();

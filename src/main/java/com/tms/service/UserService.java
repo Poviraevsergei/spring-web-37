@@ -8,18 +8,14 @@ import com.tms.model.User;
 import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
 import com.tms.repository.UserRepository;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 
 @Service
@@ -37,7 +33,7 @@ public class UserService {
         return Optional.ofNullable(userFromDb);
     }
 
-    public Page<User> getAllUsers(Pageable pageable) {
+    /*public Page<User> getAllUsers(Pageable pageable) {
         User user = new User();
         user.setId(1);
         return new Page<User>() {
@@ -121,7 +117,7 @@ public class UserService {
                 return null;
             }
         };
-    }
+    }*/
 
     public User save(UserCreateDto dto) throws UserCreateException {
         User user = new User();
