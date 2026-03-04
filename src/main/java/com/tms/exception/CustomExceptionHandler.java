@@ -1,6 +1,7 @@
 package com.tms.exception;
 
 import jakarta.persistence.NoResultException;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.NonUniqueResultException;
 import org.springframework.http.HttpStatus;
@@ -81,5 +82,11 @@ public class CustomExceptionHandler {
     public ResponseEntity<String> noResultExceptionHandler(NoResultException e) {
         log.error("ExceptionHandler: " + e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> validationExceptionHandler(ValidationException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

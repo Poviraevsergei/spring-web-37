@@ -3,20 +3,16 @@ package com.tms.service;
 import com.tms.exception.UpdateException;
 import com.tms.exception.UserCreateException;
 import com.tms.exception.UserNotFoundException;
-import com.tms.model.Security;
 import com.tms.model.User;
 import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
 import com.tms.repository.UserRepository;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 public class UserService {
@@ -29,12 +25,11 @@ public class UserService {
     }
 
     public Optional<User> getUserById(Integer id) {
-        User userFromDb = userRepository.findUserById(id);
-        return Optional.ofNullable(userFromDb);
+        return userRepository.findById(id);
     }
 
     public List<User> getAllUsers() {
-       return userRepository.findAllUsers();
+       return userRepository.findAll();
     }
 
     public User save(UserCreateDto dto) throws UserCreateException {
@@ -46,28 +41,28 @@ public class UserService {
         user.setCreated(Instant.now());
         user.setUpdated(Instant.now());
 
-        return userRepository.saveUser(user);
+        return userRepository.save(user);
     }
 
     public void delete(Integer id) throws UserNotFoundException {
-        User user = userRepository.findUserById(id);
-        if (user == null){
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
             throw new UserNotFoundException();
         }
-        userRepository.removeUserById(id);
-
+        userRepository.deleteById(id);
     }
 
     public User update(UserUpdateDto updateDto) throws UserNotFoundException, UpdateException {
-        User user = userRepository.findUserById(updateDto.getId());
-        if (user == null){
+        Optional<User> userOptional = userRepository.findById(updateDto.getId());
+        if (userOptional.isEmpty()) {
             throw new UserNotFoundException();
         }
+        User user = userOptional.get();
         user.setFirstName(updateDto.getFirstName());
         user.setLastName(updateDto.getLastName());
         user.setEmail(updateDto.getEmail());
         user.setAge(updateDto.getAge());
         user.setUpdated(Instant.now());
-        return userRepository.updateUser(user);
+        return userRepository.saveAndFlush(user);
     }
 }

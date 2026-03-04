@@ -5,19 +5,18 @@ import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
 import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Optional;
 
@@ -31,22 +30,17 @@ public class SecurityController {
         this.securityService = securityService;
     }
 
-    @GetMapping("/registration")
-    public String getRegistrationPage() {
-        return "registration";
-    }
-
     @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> registration(@ModelAttribute @Valid RequestRegistrationDTO registrationDTO,
+    public ResponseEntity<UserResponse> registration(@Valid @RequestBody RequestRegistrationDTO registrationDTO,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             for (ObjectError objectError : bindingResult.getAllErrors()) {
                 log.warn(objectError.getDefaultMessage());
             }
-           return null;
+            throw new ValidationException();
         }
         UserResponse userResponse = securityService.registration(registrationDTO);
-        return null;
+        return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
