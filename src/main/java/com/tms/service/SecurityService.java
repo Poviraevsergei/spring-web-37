@@ -72,7 +72,6 @@ public class SecurityService {
         return securityRepository.findById(id);
     }
 
-    //TODO: Paging, sorting
     public List<Security> getAllSecurities(){
         return securityRepository.findAll();
     }
