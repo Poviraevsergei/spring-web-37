@@ -10,6 +10,9 @@ import com.tms.repository.UserRepository;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +26,13 @@ public class SecurityService {
 
     private final UserRepository userRepository;
     private final SecurityRepository securityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SecurityService(SecurityRepository securityRepository, UserRepository userRepository) {
+    public SecurityService(SecurityRepository securityRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.securityRepository = securityRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -50,7 +55,7 @@ public class SecurityService {
 
         Security security = new Security();
         security.setUsername(registrationDTO.getUsername());
-        security.setPassword(registrationDTO.getPassword());
+        security.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         security.setCreated(Instant.now());
         security.setUpdated(Instant.now());
         security.setRole(Role.USER);
@@ -74,5 +79,15 @@ public class SecurityService {
 
     public List<Security> getAllSecurities(){
         return securityRepository.findAll();
+    }
+
+    public boolean canAccess(Integer id){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Security> optionalSecurity = securityRepository.findByUsername(username);
+        if(optionalSecurity.isEmpty()){
+            throw new UsernameNotFoundException(username);
+        }
+        Security security = optionalSecurity.get();
+        return security.getUserId().equals(id) || security.getRole().equals(Role.ADMIN);
     }
 }

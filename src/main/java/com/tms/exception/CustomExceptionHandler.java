@@ -7,6 +7,8 @@ import org.hibernate.NonUniqueResultException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -88,5 +90,17 @@ public class CustomExceptionHandler {
     public ResponseEntity<String> validationExceptionHandler(ValidationException e) {
         log.error("ExceptionHandler: " + e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<String> usernameNotFoundExceptionHandler(UsernameNotFoundException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> accessDeniedExceptionExceptionHandler(AccessDeniedException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 }

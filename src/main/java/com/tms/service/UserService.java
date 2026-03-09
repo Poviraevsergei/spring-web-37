@@ -8,6 +8,7 @@ import com.tms.model.dto.UserCreateDto;
 import com.tms.model.dto.UserUpdateDto;
 import com.tms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,11 +18,13 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private final SecurityService securityService;
     private final UserRepository userRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, SecurityService securityService) {
         this.userRepository = userRepository;
+        this.securityService = securityService;
     }
 
     public Optional<User> getUserById(Integer id) {
@@ -29,7 +32,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-       return userRepository.findAll();
+        return userRepository.findAll();
     }
 
     public User save(UserCreateDto dto) throws UserCreateException {
@@ -45,6 +48,9 @@ public class UserService {
     }
 
     public void delete(Integer id) throws UserNotFoundException {
+        if (!securityService.canAccess(id)) {
+            throw new AccessDeniedException("Access denied for user id=" + id);
+        }
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new UserNotFoundException();

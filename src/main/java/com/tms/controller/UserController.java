@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,7 +99,9 @@ public class UserController {
 
     @Tag(name = "Удаление", description = "Эндпоинты связанные с удалением!!!")
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id) throws UserNotFoundException {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id, Principal principal) throws UserNotFoundException {
+        String username = principal.getName(); //Логин пользователя который прошел аутентификацию
+
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
