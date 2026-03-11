@@ -3,10 +3,12 @@ package com.tms.service;
 import com.tms.model.Role;
 import com.tms.model.Security;
 import com.tms.model.User;
+import com.tms.model.dto.AuthRequestDto;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.repository.SecurityRepository;
 import com.tms.repository.UserRepository;
+import com.tms.utils.JwtUtils;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,11 @@ public class SecurityService {
     private final UserRepository userRepository;
     private final SecurityRepository securityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @Autowired
-    public SecurityService(SecurityRepository securityRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public SecurityService(JwtUtils jwtUtils, SecurityRepository securityRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.jwtUtils = jwtUtils;
         this.securityRepository = securityRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -89,5 +93,21 @@ public class SecurityService {
         }
         Security security = optionalSecurity.get();
         return security.getUserId().equals(id) || security.getRole().equals(Role.ADMIN);
+    }
+
+    public Optional<String> generateToken(AuthRequestDto dto){
+        log.info("IN: SecurityService:generateToken");
+        Optional<Security> securityOptional = securityRepository.findByUsername(dto.getUsername());
+        if(securityOptional.isEmpty()){
+            throw new UsernameNotFoundException(dto.getUsername());
+        }
+        Security security = securityOptional.get();
+        if (passwordEncoder.matches(dto.getPassword(), security.getPassword())){
+            Optional<String> jwtOptional = Optional.ofNullable(jwtUtils.generateToken(dto.getUsername()));
+            log.info("OUT: SecurityService:generateToken");
+            return jwtOptional;
+        }
+        log.info("OUT: SecurityService:generateToken");
+        return Optional.empty();
     }
 }

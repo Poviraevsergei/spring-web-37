@@ -1,5 +1,6 @@
 package com.tms.exception;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.NoResultException;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -102,5 +103,11 @@ public class CustomExceptionHandler {
     public ResponseEntity<String> accessDeniedExceptionExceptionHandler(AccessDeniedException e) {
         log.error("ExceptionHandler: " + e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<String> jwtExceptionHandler(JwtException e) {
+        log.error("ExceptionHandler: " + e);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

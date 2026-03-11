@@ -1,6 +1,8 @@
 package com.tms.controller;
 
 import com.tms.model.Security;
+import com.tms.model.dto.AuthRequestDto;
+import com.tms.model.dto.AuthResponseDto;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
@@ -32,7 +34,7 @@ public class SecurityController {
 
     @PostMapping("/registration")
     public ResponseEntity<UserResponse> registration(@Valid @RequestBody RequestRegistrationDTO registrationDTO,
-                                                   BindingResult bindingResult) {
+                                                     BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             for (ObjectError objectError : bindingResult.getAllErrors()) {
                 log.warn(objectError.getDefaultMessage());
@@ -50,5 +52,14 @@ public class SecurityController {
             return ResponseEntity.ok(securityOptional.get());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/generate")
+    public ResponseEntity<AuthResponseDto> generateJwt(@Valid @RequestBody AuthRequestDto authRequestDto) {
+        Optional<String> token = securityService.generateToken(authRequestDto);
+        if (token.isPresent()) {
+            return new ResponseEntity<>(new AuthResponseDto(token.get()), HttpStatus.CREATED);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
