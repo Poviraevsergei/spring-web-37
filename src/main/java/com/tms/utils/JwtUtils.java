@@ -53,8 +53,12 @@ public class JwtUtils {
         return Optional.empty();
     }
 
-    //TODO: secretKey
     public String getUsernameFromToken(String token) {
-        return Jwts.parser().setSigningKey(getSigningKey()).build().parseSignedClaims(token).getPayload().getSubject();
+        return Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
 }

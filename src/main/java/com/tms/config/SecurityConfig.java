@@ -1,11 +1,9 @@
 package com.tms.config;
 
 import com.tms.filter.JwtFilter;
-import com.tms.service.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,10 +27,13 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/user", "GET")).hasRole("USER")
+                        .requestMatchers(new AntPathRequestMatcher("/user", "GET")).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/user/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/security/generate")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/security/registration")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/swagger-config")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/v3/api-docs")).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -44,5 +45,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
-//TODO: авотризация через аннотации, сваггер, тесты
