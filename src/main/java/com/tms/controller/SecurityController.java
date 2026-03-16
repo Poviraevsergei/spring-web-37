@@ -6,11 +6,13 @@ import com.tms.model.dto.AuthResponseDto;
 import com.tms.model.dto.RequestRegistrationDTO;
 import com.tms.model.dto.UserResponse;
 import com.tms.service.SecurityService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @Slf4j
 @RestController
 @RequestMapping("/security")
@@ -45,6 +48,7 @@ public class SecurityController {
         return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Security> getSecurityById(@PathVariable("id") Integer id) {
         Optional<Security> securityOptional = securityService.getSecurityById(id);

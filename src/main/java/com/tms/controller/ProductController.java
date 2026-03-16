@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable("id") Integer id) {
         Optional<Product> productOptional = productService.getProductById(id);
@@ -35,6 +37,7 @@ public class ProductController {
         return ResponseEntity.notFound().build();
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/sort/{sortField}")
     public ResponseEntity<List<Product>> getAllProductsBySortField(@PathVariable("sortField") String sortField) {
         List<Product> products = productService.getAllProductsWithSort(sortField);
@@ -44,8 +47,9 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/pagination/{page}/{size}")
-    public ResponseEntity<Page<Product>> getAllProductsBySortField(@PathVariable("page") int page, @PathVariable("size") int size) {
+    public ResponseEntity<Page<Product>> getAllProductsByPaginationField(@PathVariable("page") int page, @PathVariable("size") int size) {
         Page<Product> products = productService.getAllProductsWithPagination(page, size);
         if (products.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -53,6 +57,7 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/{userId}/{productId}")
     public ResponseEntity<HttpStatus> addProduct(@PathVariable Integer userId, @PathVariable Integer productId) {
         Boolean isAdded = productService.addProductToUser(userId, productId);

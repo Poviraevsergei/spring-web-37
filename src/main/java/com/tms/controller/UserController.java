@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @Operation(summary = "Поиск пользователей",
             description = "Система ищет пользователя в БД по id который передан в пути.")
     @ApiResponses(value = {
@@ -66,12 +68,14 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> userPage = userService.getAllUsers();
         return ResponseEntity.ok(userPage);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody @Valid UserCreateDto userDto,
                                            BindingResult bindingResult) throws UserCreateException {
@@ -88,6 +92,7 @@ public class UserController {
         return ResponseEntity.created(location).body(user);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping
     public ResponseEntity<User> updateUser(@RequestBody @Valid UserUpdateDto userDto,
                                                  BindingResult bindingResult) throws UserNotFoundException, UpdateException {
@@ -99,12 +104,11 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @Tag(name = "Удаление", description = "Эндпоинты связанные с удалением!!!")
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id, Principal principal) throws UserNotFoundException {
-        String username = principal.getName(); //Логин пользователя который прошел аутентификацию
-
-        userService.delete(id);
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id) throws UserNotFoundException {
+               userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

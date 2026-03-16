@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,12 +34,14 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<HttpStatus> upload(@RequestParam("file_key") MultipartFile file) throws CustomFileException {
         fileService.upload(file);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{filename}")
     public ResponseEntity<Resource> getFile(@PathVariable("filename") String filename) throws CustomFileException {
         Resource resource = fileService.getFile(filename);
@@ -47,6 +50,7 @@ public class FileController {
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @Tag(name = "Удаление")
     @DeleteMapping("/{filename}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("filename") String filename) throws CustomFileException, FileNotFoundException {
@@ -56,6 +60,7 @@ public class FileController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @Hidden
     @GetMapping
     public ResponseEntity<List<String>> getFiles() throws IOException {
