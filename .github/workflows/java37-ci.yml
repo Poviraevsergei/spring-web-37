@@ -1,0 +1,47 @@
+name: Java CI Spring web 37
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21 with Maven cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run tests
+        run: mvn clean test
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'test-reports'
+          path: target/surefire-reports/
+          if-no-files-found: 'warn'
+
+      - name: Build and upload JAR
+        if: github.ref == 'refs/heads/master'
+        run:
+          mvn package -DskipTest
+
+      - name: Upload prod artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'application-jar'
+          path: target/*.jar
+          if-no-files-found: 'error'
